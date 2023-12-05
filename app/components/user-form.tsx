@@ -1,8 +1,10 @@
 "use client";
 
+import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
+import { CREATE_USER } from "../constants";
 
-const UserForm = () => {
+const UserForm = ({ refetch }: any) => {
   const {
     register,
     handleSubmit,
@@ -10,8 +12,15 @@ const UserForm = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
+  const [createUser] = useMutation(CREATE_USER);
+
   const onSubmit = async (data: any) => {
-    console.log({ data });
+    const { age, first_name, last_name, email } = data || {};
+
+    await createUser({
+      variables: { input: { age: Number(age), first_name, last_name, email } },
+    });
+    refetch();
     reset();
   };
 
@@ -59,7 +68,11 @@ const UserForm = () => {
         {errors.age && <span>age is required</span>}
       </div>
 
-      <button className="w-1/2 mx-auto my-4 bg-orange-500 text-white h-12 rounded ">
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-1/2 mx-auto my-4 bg-orange-500 text-white h-12 rounded "
+      >
         Create User
       </button>
     </form>
